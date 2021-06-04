@@ -9,10 +9,10 @@
 
 /*
 Assumptions.
-0. two point a,b a!=b then their x,y coordinates differ more than eps
+0. two point a,b a!=b then their x coordinates differ more than eps
 1. no vertical line
-2. two line intersects except line intersects at the endpoint of both line
-3. a point cannot lies on a line except endpoint of the line.
+2. all lines are distinct
+3. a point cannot lie on a line
 4. all lines and points are inside the bounding box
 */
 constexpr double eps = 1e-6; // |x-y|<eps then consider as same point

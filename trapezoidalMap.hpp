@@ -64,6 +64,7 @@ struct TNode {
 	TNode* lc, * rc;
 	virtual bool isLeaf() = 0;
 	virtual TNode* query(const Point& pt) = 0;
+	int maxDepth();
 };
 
 struct XNode : TNode{
@@ -96,6 +97,7 @@ struct TrapezoidalMap {
 	TrapezoidalMap(const Point& bottomLeft, const Point& topRight);
 	Trapezoid* query(const Point& p);
 	void insert(const Line& l);
+	int maxDepth();
 	~TrapezoidalMap() = default;
 
 private:

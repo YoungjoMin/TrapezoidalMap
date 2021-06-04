@@ -43,6 +43,11 @@ std::ostream& operator<<(std::ostream& o, const Line& l) {
 }
 
 
+int TNode::maxDepth() {
+	if (isLeaf()) return 0;
+	return std::max(lc->maxDepth(), rc->maxDepth()) + 1;
+}
+
 bool XNode::isLeaf() {
 	return false;
 }
@@ -93,6 +98,9 @@ std::ostream& operator<<(std::ostream& o, const Trapezoid& t) {
 	return o;
 }
 
+int TrapezoidalMap::maxDepth() {
+	return root->maxDepth();
+}
 
 TrapezoidalMap::TrapezoidalMap(const Point& bl, const Point& tr) {
 	Point br(tr.x, bl.y), tl(bl.x, tr.y);

@@ -14,7 +14,7 @@ Point operator+(const Point& p1, const Point& p2) {
 	return Point(p1.x + p2.x, p1.y + p2.y);
 }
 Point Point::operator*(double s) {
-	return Point(x * s, y * x);
+	return Point(x * s, y * s);
 }
 Point Point::normalize() {
 	double s = std::sqrt(x * x + y * y);
@@ -35,7 +35,7 @@ Line::Line(const Point& pl_, const Point& pr_) {
 }
 bool Line::isUpper(const Point& p) const {
 	Point t1 = pr - pl, t2 = p - pl;
-	return (t1.x * t2.y - t1.y * t2.x) < 0;
+	return (t1.x * t2.y - t1.y * t2.x) < eps;
 }
 std::ostream& operator<<(std::ostream& o, const Line& l) {
 	o <<"[ "<<l.pl << " -> " << l.pr << " ]";
@@ -43,6 +43,9 @@ std::ostream& operator<<(std::ostream& o, const Line& l) {
 
 }
 
+bool Line::IsPtEndpoint(const Point& p) const {
+	return pl.isSame(p) || pr.isSame(p);
+}
 
 int TNode::maxDepth() {
 	if (isLeaf()) return 0;
@@ -77,6 +80,10 @@ TNode* LeafNode::query(const Point& pt) {
 	return this;
 }
 
+Trapezoid::Trapezoid(Line top, Line bottom, Point leftp, Point rightp) : top(top), bottom(bottom), leftp(leftp), rightp(rightp) {
+	lowerleft = upperleft = lowerright = upperright = NULL;
+}
+
 bool Trapezoid::isInside(const Point& pt) {
 	return top.isUpper(pt)
 		&& !bottom.isUpper(pt)
@@ -85,7 +92,7 @@ bool Trapezoid::isInside(const Point& pt) {
 }
 void Trapezoid::updateLeftTrapezoid(Trapezoid* prv, Trapezoid* cur) {
 	if (lowerleft == prv) lowerleft = cur;
-	if (upperleft = prv) upperleft = cur;
+	if (upperleft == prv) upperleft = cur;
 }
 void Trapezoid::updateRightTrapezoid(Trapezoid* prv, Trapezoid* cur) {
 	if (lowerright == prv) lowerright = cur;
@@ -107,7 +114,6 @@ TrapezoidalMap::TrapezoidalMap(const Point& bl, const Point& tr) {
 	Point br(tr.x, bl.y), tl(bl.x, tr.y);
 
 	Trapezoid* t = new Trapezoid(Line(tl,tr), Line(bl, br), bl,tr);
-	t->upperleft = t->upperright = t->lowerleft = t->lowerright = NULL;
 
 	LeafNode* leaf = new LeafNode(t);
 	root = leaf;
@@ -158,11 +164,17 @@ void TrapezoidalMap::insert(const Line& l) {
 	}
 
 	ntl = nextTrapezoid(tl, l);
+	if (ntl == NULL)
+		std::cout << "what???\n";
 	insert_left_endpoint(tl, l, Y, Z);
 	tl = ntl;
+
 	while (!tl->isInside(pr)) {
 		ntl = nextTrapezoid(tl, l);
+		if (ntl == NULL)
+			std::cout << "what???\n";
 		insert_no_segment_endpoint(tl, l, Y, Z);
+
 		tl = ntl;
 	}
 	insert_right_endpint(tl, l, Y, Z);
@@ -175,9 +187,9 @@ void TrapezoidalMap::insert_two_segment_endpoint(Trapezoid* A, const Line& s)
 	const Point& p = s.pl, & q = s.pr;
 
 	Trapezoid* U = new Trapezoid(A->top, A->bottom, A->leftp, p);
-	Trapezoid* X = new Trapezoid(A->top, A->bottom,  q, A->rightp);
 	Trapezoid* Y = new Trapezoid(A->top, s, p, q);
 	Trapezoid* Z = new Trapezoid(s, A->bottom, p, q);
+	Trapezoid* X = new Trapezoid(A->top, A->bottom, q, A->rightp);
 
 	Y->lowerleft = Y->upperleft = Z->lowerleft = Z->upperleft = U;
 	Y->lowerright = Y->upperright = Z->lowerright = Z->upperright = X;
@@ -226,32 +238,47 @@ void TrapezoidalMap::insert_left_endpoint(Trapezoid* A, const Line& s, Trapezoid
 	const Point& p = s.pl, &q = s.pr;
 	
 	Trapezoid* X = new Trapezoid(A->top, A->bottom, A->leftp, p);
-	Trapezoid* Y = new Trapezoid(A->top, s, p, s.isUpper(A->rightp) ? Point() : A->rightp); //may not know rightp at this moment
-	Trapezoid* Z = new Trapezoid(s, A->bottom, p, s.isUpper(A->rightp) ? A->rightp : Point()); //may not know rightp at this moment
+	Trapezoid* Y = new Trapezoid(A->top, s, p, Point()); //may not know rightp at this moment
+	Trapezoid* Z = new Trapezoid(s, A->bottom, p, Point()); //may not know rightp at this moment
+	
 
-	X->lowerleft = A->lowerleft;
-	X->upperleft = A->upperleft;
 	X->upperright = Y;
 	X->lowerright = Z;
+	X->lowerleft = A->lowerleft;
+	X->upperleft = A->upperleft;
+	if (A->lowerleft != NULL) A->lowerleft->updateRightTrapezoid(A, X);
+	if (A->upperleft != NULL) A->upperleft->updateRightTrapezoid(A, X);
 
 	Y->upperleft = Y->lowerleft = X;
 	Z->upperleft = Z->lowerleft = X;
-	if (s.isUpper(A->rightp)) {
-		Z->upperright = A->upperright;
-		Z->lowerright = A->lowerright;
-		//Y-> updated next time
+
+
+	if (s.isUpper(A->rightp)) { //Z is the next A
+		Z->rightp = A->rightp;
+		//Z->upperright = NULL;
+		//Z->lowerright = NULL;
+		if (A->rightp.isSame(A->bottom.pr) == false) {
+			Z->lowerright = A->lowerright;
+			if (A->lowerright != NULL) A->lowerright->updateLeftTrapezoid(A, Z);
+		}
+
+		//Y-> updated next time both right is NULL
+		//Z-> both right is NULL or only upperright is NULL
 	}
-	else {
-		Y->upperright = A->upperright;
-		Y->lowerright = A->lowerright;
-		//Z-> updated next time
+	else { //Y is the next A
+		Y->rightp = A->rightp;
+		//Y->upperright = NULL;
+		//Y->lowerright = NULL;
+		if (A->rightp.isSame(A->top.pr) == false) {
+			Y->upperright = A->upperright;
+			if (A->upperright != NULL)A->upperright->updateLeftTrapezoid(A, Y);
+		}
+
+		//Y-> both right is NULL or only upperright is NULL
+		//Z-> updated next time both right is NULL
 	}
 	
 
-	if (A->lowerleft != NULL) A->lowerleft->updateRightTrapezoid(A, X);
-	if (A->upperleft != NULL) A->upperleft->updateRightTrapezoid(A, X);
-	if (A->lowerright != NULL)A->lowerright->updateLeftTrapezoid(A, s.isUpper(A->rightp) ? Z : Y);
-	if (A->upperright != NULL)A->upperright->updateLeftTrapezoid(A, s.isUpper(A->rightp) ? Z : Y);
 
 	XNode* pnode = new XNode(p);
 	YNode* snode = new YNode(s);
@@ -287,35 +314,51 @@ void TrapezoidalMap::insert_no_segment_endpoint(Trapezoid* A, const Line& s, Tra
 	Trapezoid* Y = s.isUpper(A->leftp) ? pY : new Trapezoid(A->top, s, A->leftp, Point()); //for some case may not know rightp of Y
 	Trapezoid* Z = s.isUpper(A->leftp) ? new Trapezoid(s, A->bottom, A->leftp, Point()) : pZ; //for some case may not know rightp of Z
 
+
 	if (s.isUpper(A->leftp)) {
-		Z->lowerleft = A->lowerleft;
-		Z->upperleft = A->upperleft;
-		pZ->rightp = A->leftp;
-		pZ->updateRightTrapezoid(A, Z);
+		Z->upperleft = Z->lowerleft = pZ;
+		
+		if (pZ->lowerright == NULL) {
+			Z->lowerleft = A->lowerleft;
+			if (A->lowerleft != NULL) A->lowerleft->updateRightTrapezoid(A, Z);
+		}
+		pZ->updateRightTrapezoid(NULL, Z);
 	}
 	else {
-		Y->lowerleft = A->lowerleft;
-		Y->upperleft = A->upperleft;
-		pY->rightp = A->leftp;
-		pY->updateRightTrapezoid(A, Y);
-	}
+		Y->upperleft = Y->lowerleft = pY;
 
-	if (s.isUpper(A->rightp)) {
-		Z->upperright = A->upperright;
-		Z->lowerright = A->lowerright;
-		//Y-> updated next time
-	}
-	else {
-		Y->upperright = A->upperright;
-		Y->lowerright = A->lowerright;
-		//Z-> updated next time
+		if (pY->upperright == NULL) {
+			Y->upperleft = A->upperleft;
+			if (A->upperleft != NULL) A->upperleft->updateRightTrapezoid(A, Y);
+		}
+		pY->updateRightTrapezoid(NULL, Y);
 	}
 
 
-	if (A->lowerleft != NULL) A->lowerleft->updateRightTrapezoid(A, s.isUpper(A->leftp) ? Z : Y);
-	if (A->upperleft != NULL) A->upperleft->updateRightTrapezoid(A, s.isUpper(A->leftp) ? Z : Y);
-	if (A->lowerright != NULL)A->lowerright->updateLeftTrapezoid(A, s.isUpper(A->rightp) ? Z : Y);
-	if (A->upperright != NULL)A->upperright->updateLeftTrapezoid(A, s.isUpper(A->rightp) ? Z : Y);
+	if (s.isUpper(A->rightp)) { //Z is the next A
+		Z->rightp = A->rightp;
+		//Z->upperright = NULL;
+		//Z->lowerright = NULL;
+		if (A->rightp.isSame(A->bottom.pr) == false) {
+			Z->lowerright = A->lowerright;
+			if (A->lowerright != NULL) A->lowerright->updateLeftTrapezoid(A, Z);
+		}
+
+		//Y-> updated next time both right is NULL
+		//Z-> both right is NULL or only upperright is NULL
+	}
+	else { //Y is the next A
+		Y->rightp = A->rightp;
+		//Y->upperright = NULL;
+		//Y->lowerright = NULL;
+		if (A->rightp.isSame(A->top.pr) == false) {
+			Y->upperright = A->upperright;
+			if (A->upperright != NULL)A->upperright->updateLeftTrapezoid(A, Y);
+		}
+
+		//Y-> both right is NULL or only upperright is NULL
+		//Z-> updated next time both right is NULL
+	}
 
 	YNode* snode = new YNode(s);
 	LeafNode* originalNode = (LeafNode*)A->node;
@@ -354,21 +397,24 @@ void TrapezoidalMap::insert_right_endpint(Trapezoid* A, const Line& s, Trapezoid
 	Y->rightp = Z->rightp = q;
 
 	if (s.isUpper(A->leftp)) {
-		Z->upperleft = A->upperleft;
-		Z->lowerleft = A->lowerleft;
-		pZ->rightp = A->leftp;
-		pZ->updateRightTrapezoid(A, Z);
+		Z->upperleft = Z->lowerleft = pZ;
+
+		if (pZ->lowerright == NULL) {
+			Z->lowerleft = A->lowerleft;
+			if (A->lowerleft != NULL) A->lowerleft->updateRightTrapezoid(A, Z);
+		}
+		pZ->updateRightTrapezoid(NULL, Z);
 	}
 	else {
-		Y->upperleft = A->upperleft;
-		Y->lowerleft = A->lowerleft;
-		pY->rightp = A->leftp;
-		pY->updateRightTrapezoid(A, Y);
+		Y->upperleft = Y->lowerleft = pY;
+
+		if (pY->upperright == NULL) {
+			Y->upperleft = A->upperleft;
+			if (A->upperleft != NULL) A->upperleft->updateRightTrapezoid(A, Y);
+		}
+		pY->updateRightTrapezoid(NULL, Y);
 	}
 
-
-	if (A->lowerleft != NULL)A->lowerleft->updateRightTrapezoid(A, s.isUpper(A->rightp) ? Z : Y);
-	if (A->upperleft != NULL)A->upperleft->updateRightTrapezoid(A, s.isUpper(A->rightp) ? Z : Y);
 	if (A->lowerright != NULL)A->lowerright->updateLeftTrapezoid(A, X);
 	if (A->upperright != NULL)A->upperright->updateLeftTrapezoid(A, X);
 

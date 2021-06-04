@@ -6,7 +6,7 @@
 #include <vector>
 #include <iostream>
 #include <set>
-
+#include <cassert>
 
 /*
 Assumptions.
@@ -44,6 +44,7 @@ struct Line {
 	Line(const Line& l) : pl(l.pl), pr(l.pr) {};
 	friend std::ostream& operator<<(std::ostream& o, const Line& l);
 	bool isUpper(const Point& p) const;//this line is upper than p
+	bool IsPtEndpoint(const Point& p) const;
 };
 
 struct Trapezoid {
@@ -54,7 +55,7 @@ struct Trapezoid {
 	Trapezoid* upperright, * lowerright;
 	Trapezoid* upperleft, * lowerleft;
 
-	Trapezoid(Line top, Line bottom, Point leftp, Point rightp) : top(top), bottom(bottom), leftp(leftp), rightp(rightp) {}
+	Trapezoid(Line top, Line bottom, Point leftp, Point rightp);
 	friend std::ostream& operator<<(std::ostream& o, const Trapezoid& t);
 	bool isInside(const Point& pt);
 	void updateLeftTrapezoid(Trapezoid* prv, Trapezoid* cur);

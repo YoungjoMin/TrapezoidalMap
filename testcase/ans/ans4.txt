@@ -1,0 +1,117 @@
+query point : ( -12.5 , 10.5 )
+top : [ ( -100 , 100 ) -> ( 100 , 100 ) ]
+bottom : [ ( -100 , -100 ) -> ( 100 , -100 ) ]
+leftp : ( -100 , -100 )
+rightp : ( -12 , -2 )
+
+
+query point : ( 10.5 , 9.5 )
+top : [ ( -100 , 100 ) -> ( 100 , 100 ) ]
+bottom : [ ( 7 , 5 ) -> ( 14 , 5 ) ]
+leftp : ( 10 , 7 )
+rightp : ( 14 , 5 )
+
+
+query point : ( 1.5 , 8.5 )
+top : [ ( -100 , 100 ) -> ( 100 , 100 ) ]
+bottom : [ ( -8 , 8 ) -> ( 8 , 8 ) ]
+leftp : ( -8 , 8 )
+rightp : ( 8 , 8 )
+
+
+query point : ( 7.5 , 7.5 )
+top : [ ( -8 , 8 ) -> ( 8 , 8 ) ]
+bottom : [ ( -1 , 7 ) -> ( 10 , 7 ) ]
+leftp : ( -1 , 7 )
+rightp : ( 8 , 8 )
+
+
+query point : ( -7.5 , 5.5 )
+top : [ ( -8 , 8 ) -> ( 8 , 8 ) ]
+bottom : [ ( -11 , 5 ) -> ( 12 , -6 ) ]
+leftp : ( -8 , 8 )
+rightp : ( -4 , 4 )
+
+
+query point : ( 9.5 , 5.5 )
+top : [ ( -1 , 7 ) -> ( 10 , 7 ) ]
+bottom : [ ( 7 , 5 ) -> ( 14 , 5 ) ]
+leftp : ( 7 , 5 )
+rightp : ( 10 , 7 )
+
+
+query point : ( -1.5 , 5 )
+top : [ ( -8 , 8 ) -> ( 8 , 8 ) ]
+bottom : [ ( -4 , 4 ) -> ( 1 , 4 ) ]
+leftp : ( -4 , 4 )
+rightp : ( -1 , 7 )
+
+
+query point : ( 0.5 , 3.5 )
+top : [ ( -4 , 4 ) -> ( 1 , 4 ) ]
+bottom : [ ( -3 , 3 ) -> ( 11 , 3 ) ]
+leftp : ( -3 , 3 )
+rightp : ( 1 , 4 )
+
+
+query point : ( 6.5 , 3.5 )
+top : [ ( -1 , 7 ) -> ( 10 , 7 ) ]
+bottom : [ ( -3 , 3 ) -> ( 11 , 3 ) ]
+leftp : ( 1 , 4 )
+rightp : ( 7 , 5 )
+
+
+query point : ( 9.5 , 2.5 )
+top : [ ( -3 , 3 ) -> ( 11 , 3 ) ]
+bottom : [ ( -11 , 5 ) -> ( 12 , -6 ) ]
+leftp : ( -3 , 3 )
+rightp : ( 11 , 3 )
+
+
+query point : ( -0.5 , 1.5 )
+top : [ ( -3 , 3 ) -> ( 11 , 3 ) ]
+bottom : [ ( -11 , 5 ) -> ( 12 , -6 ) ]
+leftp : ( -3 , 3 )
+rightp : ( 11 , 3 )
+
+
+query point : ( 11.5 , 1.5 )
+top : [ ( 7 , 5 ) -> ( 14 , 5 ) ]
+bottom : [ ( -11 , 5 ) -> ( 12 , -6 ) ]
+leftp : ( 11 , 3 )
+rightp : ( 12 , -6 )
+
+
+query point : ( -5 , 1 )
+top : [ ( -11 , 5 ) -> ( 12 , -6 ) ]
+bottom : [ ( -12 , -2 ) -> ( -2 , -2 ) ]
+leftp : ( -11 , 5 )
+rightp : ( -2 , -2 )
+
+
+query point : ( 0 , -2 )
+top : [ ( -11 , 5 ) -> ( 12 , -6 ) ]
+bottom : [ ( -4 , -3 ) -> ( 3 , -3 ) ]
+leftp : ( -2 , -2 )
+rightp : ( 3 , -3 )
+
+
+query point : ( -7.5 , -3.5 )
+top : [ ( -12 , -2 ) -> ( -2 , -2 ) ]
+bottom : [ ( -10 , -4 ) -> ( 4 , -4 ) ]
+leftp : ( -10 , -4 )
+rightp : ( -4 , -3 )
+
+
+query point : ( -0.5 , -3.5 )
+top : [ ( -4 , -3 ) -> ( 3 , -3 ) ]
+bottom : [ ( -10 , -4 ) -> ( 4 , -4 ) ]
+leftp : ( -4 , -3 )
+rightp : ( 3 , -3 )
+
+
+query point : ( 5.5 , -5.5 )
+top : [ ( -11 , 5 ) -> ( 12 , -6 ) ]
+bottom : [ ( -100 , -100 ) -> ( 100 , -100 ) ]
+leftp : ( 4 , -4 )
+rightp : ( 12 , -6 )

@@ -1,0 +1,26 @@
+query point : ( -6 , 1 )
+top : [ ( -11 , 3 ) -> ( 0 , 3 ) ]
+bottom : [ ( -100 , -100 ) -> ( 100 , -100 ) ]
+leftp : ( -11 , 3 )
+rightp : ( 0 , 3 )
+
+
+query point : ( -1 , 6 )
+top : [ ( -4 , 7 ) -> ( 6 , 7 ) ]
+bottom : [ ( -13 , 5 ) -> ( 17 , 5 ) ]
+leftp : ( -4 , 7 )
+rightp : ( 6 , 7 )
+
+
+query point : ( 5 , 8 )
+top : [ ( -8 , 10 ) -> ( 9 , 10 ) ]
+bottom : [ ( -4 , 7 ) -> ( 6 , 7 ) ]
+leftp : ( -4 , 7 )
+rightp : ( 6 , 7 )
+
+
+query point : ( 16 , 6 )
+top : [ ( 15 , 7 ) -> ( 18 , 7 ) ]
+bottom : [ ( -13 , 5 ) -> ( 17 , 5 ) ]
+leftp : ( 15 , 7 )
+rightp : ( 17 , 5 )

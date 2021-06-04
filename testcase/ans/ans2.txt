@@ -1,0 +1,19 @@
+query point : ( -1 , 0 )
+top : [ ( -2 , 1 ) -> ( 6 , 2 ) ]
+bottom : [ ( -5 , -2 ) -> ( 2 , 0 ) ]
+leftp : ( -2 , 1 )
+rightp : ( 2 , 0 )
+
+
+query point : ( 4 , 0 )
+top : [ ( -2 , 1 ) -> ( 6 , 2 ) ]
+bottom : [ ( -100 , -100 ) -> ( 100 , -100 ) ]
+leftp : ( 2 , 0 )
+rightp : ( 6 , 2 )
+
+
+query point : ( -2 , 6 )
+top : [ ( -100 , 100 ) -> ( 100 , 100 ) ]
+bottom : [ ( -4 , 2 ) -> ( 0 , 4 ) ]
+leftp : ( -4 , 2 )
+rightp : ( 0 , 4 )

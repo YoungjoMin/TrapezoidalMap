@@ -1,19 +1,22 @@
 #include "trapezoidalMap.hpp"
+#include "input.hpp"
 #include <algorithm>
 #include <iostream>
-#include <random>
 #include <chrono>
 
-void getAnalysis(const std::vector<Line>& lines, double bd) {
+//all leaf node is accessible ie) there exists point p s.t. search tree finds that leaf node by p
+//leaf node's #parent <=4 // XNode by leftp, rightp, or YNode by top, bottom are the whole candidate
+
+void getAnaylsis(const std::vector<Line>& lines, double bd) {
 	auto start = std::chrono::high_resolution_clock::now();
 	TrapezoidalMap tm(Point(-bd, -bd), Point(bd, bd));
 	for (const Line& l : lines) {
 		tm.insert(l);
 	}
 	auto end = std::chrono::high_resolution_clock::now();
-	auto t = std::chrono::duration<double>(end - start).count();
+	std::chrono::duration<double> sec = end - start;
 	int maxDepth = tm.maxDepth();
-	std::cout << "time : " << t << '\n';
+	std::cout << "time : " << sec.count()<< '\n';
 	std::cout << "max depth : " << maxDepth << '\n';
 }
 
@@ -79,7 +82,9 @@ int testcase3() //pass
 	pts.push_back({ 5,8 });
 	pts.push_back({ 16,6 });
 
-	test(lines, pts, 100);
+	//test(lines, pts, 100);
+	getAnaylsis(lines, 100);
+
 	return 0;
 }
 
@@ -118,14 +123,25 @@ int testcase4()
 	pts.push_back({ 5.5,-5.5 });
 
 	//test(lines, pts, 100);
-	getAnalysis(lines, 100);
+	getAnaylsis(lines, 100);
 	return 0;
 
 }
 
-int main()
+
+int main_input()
 {
-	testcase4();
+	std::vector<Line> lines;
+	genInput(15,lines);
+	printInput(lines);
 	return 0;
 }
 
+int main() {
+	std::vector<Line> lines;
+	scanInput(lines);
+	//makeInputRandom(lines);
+	makeInputAdversarial_sorting(lines);
+	getAnaylsis(lines, 50000);
+	return 0;
+}

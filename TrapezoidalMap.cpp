@@ -1,5 +1,6 @@
 #include "trapezoidalMap.hpp"
 
+
 bool Point::isLeft(const Point& p) const {
 	return x < p.x;
 }
@@ -48,7 +49,7 @@ int TNode::maxDepth() {
 	return std::max(lc->maxDepth(), rc->maxDepth()) + 1;
 }
 
-bool XNode::isLeaf() {
+bool XNode::isLeaf() const {
 	return false;
 }
 TNode* XNode::query(const Point& pt) {
@@ -56,7 +57,7 @@ TNode* XNode::query(const Point& pt) {
 }
 
 
-bool YNode::isLeaf() {
+bool YNode::isLeaf() const{
 	return false;
 }
 TNode* YNode::query(const Point& pt) {
@@ -69,7 +70,7 @@ LeafNode::LeafNode(Trapezoid* t_) {
 	lc = rc = NULL;
 }
 
-bool LeafNode::isLeaf() {
+bool LeafNode::isLeaf() const{
 	return true;
 }
 TNode* LeafNode::query(const Point& pt) {
@@ -113,6 +114,22 @@ TrapezoidalMap::TrapezoidalMap(const Point& bl, const Point& tr) {
 	leaf->parents.push_back(&root);
 }
 
+TrapezoidalMap::~TrapezoidalMap() {
+	
+	std::set<TNode*> occur;
+	const auto gather = [](TNode* n, std::set<TNode*>& occur) {
+		auto gather_impl = [](TNode* n, std::set<TNode*>& occur, auto& gather_impl) mutable {
+			if (occur.find(n) != occur.end())  return;
+			occur.insert(n);
+			if (n->isLeaf()) return;
+			gather_impl(n->lc, occur, gather_impl);
+			gather_impl(n->rc, occur, gather_impl);
+		};
+		return gather_impl(n, occur, gather_impl);
+	};
+	gather(root, occur);
+	for (TNode* tmp : occur) delete tmp; //only nodes are allocated in heap
+}
 
 LeafNode* TrapezoidalMap::queryNode(const Point& p) {
 	TNode* cur = root;

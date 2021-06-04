@@ -5,6 +5,7 @@
 #include <cmath>
 #include <vector>
 #include <iostream>
+#include <set>
 
 
 /*
@@ -62,22 +63,23 @@ struct Trapezoid {
 
 struct TNode {
 	TNode* lc, * rc;
-	virtual bool isLeaf() = 0;
+	virtual bool isLeaf() const = 0;
 	virtual TNode* query(const Point& pt) = 0;
 	int maxDepth();
+	
 };
 
 struct XNode : TNode{
 	Point p;
 	XNode(Point p) : p(p) {}
-	virtual bool isLeaf();
+	virtual bool isLeaf() const;
 	virtual TNode* query(const Point& pt);
 };
 
 struct YNode : TNode {
 	Line l;
 	YNode(Line l) : l(l) {}
-	virtual bool isLeaf();
+	virtual bool isLeaf() const;
 	virtual TNode* query(const Point& pt);
 };
 
@@ -86,7 +88,7 @@ struct LeafNode : TNode {
 	Trapezoid* t;
 
 	LeafNode(Trapezoid* t);
-	virtual bool isLeaf();
+	virtual bool isLeaf() const;
 	virtual TNode* query(const Point& pt);
 };
 
@@ -98,7 +100,7 @@ struct TrapezoidalMap {
 	Trapezoid* query(const Point& p);
 	void insert(const Line& l);
 	int maxDepth();
-	~TrapezoidalMap() = default;
+	~TrapezoidalMap();
 
 private:
 	void insert_two_segment_endpoint(Trapezoid* trapezoid, const Line& l);

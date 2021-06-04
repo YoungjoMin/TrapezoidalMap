@@ -123,17 +123,21 @@ TrapezoidalMap::TrapezoidalMap(const Point& bl, const Point& tr) {
 TrapezoidalMap::~TrapezoidalMap() {
 	
 	std::set<TNode*> occur;
-	const auto gather = [](TNode* n, std::set<TNode*>& occur) {
-		auto gather_impl = [](TNode* n, std::set<TNode*>& occur, auto& gather_impl) mutable {
-			if (occur.find(n) != occur.end())  return;
-			occur.insert(n);
-			if (n->isLeaf()) return;
-			gather_impl(n->lc, occur, gather_impl);
-			gather_impl(n->rc, occur, gather_impl);
-		};
-		return gather_impl(n, occur, gather_impl);
-	};
-	gather(root, occur);
+	std::queue<TNode*> q;
+	q.push(root); occur.insert(root);
+	while (!q.empty()) {
+		TNode* cur = q.front();
+		q.pop();
+		if (cur->isLeaf()) continue;
+		if (occur.find(cur->lc) != occur.end()) {
+			q.push(cur->lc);
+			occur.insert(cur->lc);
+		}
+		if (occur.find(cur->rc) != occur.end()) {
+			q.push(cur->rc);
+			occur.insert(cur->rc);
+		}
+	}
 	for (TNode* tmp : occur) delete tmp; //only nodes are allocated in heap
 }
 
@@ -164,15 +168,11 @@ void TrapezoidalMap::insert(const Line& l) {
 	}
 
 	ntl = nextTrapezoid(tl, l);
-	if (ntl == NULL)
-		std::cout << "what???\n";
 	insert_left_endpoint(tl, l, Y, Z);
 	tl = ntl;
 
 	while (!tl->isInside(pr)) {
 		ntl = nextTrapezoid(tl, l);
-		if (ntl == NULL)
-			std::cout << "what???\n";
 		insert_no_segment_endpoint(tl, l, Y, Z);
 
 		tl = ntl;

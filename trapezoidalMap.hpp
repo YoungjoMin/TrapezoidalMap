@@ -7,6 +7,9 @@
 #include <iostream>
 #include <set>
 #include <cassert>
+#include <queue>
+#include <map>
+
 
 /*
 Assumptions.
@@ -66,8 +69,6 @@ struct TNode {
 	TNode* lc, * rc;
 	virtual bool isLeaf() const = 0;
 	virtual TNode* query(const Point& pt) = 0;
-	int maxDepth();
-	
 };
 
 struct XNode : TNode{

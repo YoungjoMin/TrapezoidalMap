@@ -47,10 +47,6 @@ bool Line::IsPtEndpoint(const Point& p) const {
 	return pl.isSame(p) || pr.isSame(p);
 }
 
-int TNode::maxDepth() {
-	if (isLeaf()) return 0;
-	return std::max(lc->maxDepth(), rc->maxDepth()) + 1;
-}
 
 bool XNode::isLeaf() const {
 	return false;
@@ -106,8 +102,50 @@ std::ostream& operator<<(std::ostream& o, const Trapezoid& t) {
 	return o;
 }
 
+
 int TrapezoidalMap::maxDepth() {
-	return root->maxDepth();
+	std::set<TNode*> occur;
+	std::map<TNode*, int> dep;
+	std::map<TNode*, int> inedges;
+	std::queue<TNode*> q;
+	q.push(root); occur.insert(root);
+	while (!q.empty()) {
+		TNode* cur = q.front();
+		q.pop();
+		if (cur->isLeaf()) continue;
+		inedges[cur->lc] += 1;
+		if (occur.find(cur->lc) == occur.end()) {
+			q.push(cur->lc);
+			occur.insert(cur->lc);
+		}
+		inedges[cur->rc] += 1;
+		if (occur.find(cur->rc) == occur.end()) {
+			q.push(cur->rc);
+			occur.insert(cur->rc);
+		}
+	}
+
+	int maxDepth = 0;
+	q.push(root);
+	while (!q.empty()) {
+		TNode* cur = q.front();
+		q.pop();
+		int cdep = dep[cur];
+		if (cur->isLeaf()) {
+			maxDepth = std::max(maxDepth, cdep);
+			continue;
+		}
+
+		if ((--inedges[cur->lc]) == 0) 
+			q.push(cur->lc);
+		dep[cur->lc] = std::max(dep[cur->lc], cdep + 1);
+
+		
+		if ((--inedges[cur->rc]) == 0) 
+			q.push(cur->rc);
+		dep[cur->rc] = std::max(dep[cur->rc], cdep + 1);
+	}
+	return maxDepth;
 }
 
 TrapezoidalMap::TrapezoidalMap(const Point& bl, const Point& tr) {
@@ -129,11 +167,11 @@ TrapezoidalMap::~TrapezoidalMap() {
 		TNode* cur = q.front();
 		q.pop();
 		if (cur->isLeaf()) continue;
-		if (occur.find(cur->lc) != occur.end()) {
+		if (occur.find(cur->lc) == occur.end()) {
 			q.push(cur->lc);
 			occur.insert(cur->lc);
 		}
-		if (occur.find(cur->rc) != occur.end()) {
+		if (occur.find(cur->rc) == occur.end()) {
 			q.push(cur->rc);
 			occur.insert(cur->rc);
 		}

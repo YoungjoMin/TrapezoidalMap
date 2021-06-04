@@ -2,6 +2,20 @@
 #include <algorithm>
 #include <iostream>
 #include <random>
+#include <chrono>
+
+void getAnalysis(const std::vector<Line>& lines, double bd) {
+	auto start = std::chrono::high_resolution_clock::now();
+	TrapezoidalMap tm(Point(-bd, -bd), Point(bd, bd));
+	for (const Line& l : lines) {
+		tm.insert(l);
+	}
+	auto end = std::chrono::high_resolution_clock::now();
+	auto t = std::chrono::duration<double>(end - start).count();
+	int maxDepth = tm.maxDepth();
+	std::cout << "time : " << t << '\n';
+	std::cout << "max depth : " << maxDepth << '\n';
+}
 
 void test(const std::vector<Line>& lines, const std::vector<Point>& pts, double bd) {
 	TrapezoidalMap tm(Point(-bd, -bd),Point(bd,bd));
@@ -13,6 +27,7 @@ void test(const std::vector<Line>& lines, const std::vector<Point>& pts, double 
 		std::cout << "query point : " << pt << '\n';
 		std::cout << *trapezoid << "\n\n";
 	}
+	std::cout << "Max depth : " << tm.maxDepth() << "\n\n\n";
 }
 
 int testcase1() //pass
@@ -102,7 +117,8 @@ int testcase4()
 	pts.push_back({ -0.5,-3.5 });
 	pts.push_back({ 5.5,-5.5 });
 
-	test(lines, pts, 100);
+	//test(lines, pts, 100);
+	getAnalysis(lines, 100);
 	return 0;
 
 }
